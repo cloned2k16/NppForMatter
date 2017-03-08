@@ -1,3 +1,3 @@
-call sudo copy "Unicode Debug\*.dll" "C:\Program Files (x86)\Notepad++\plugins\*" >deploy.log
+@call sudo copy "'Debug\*.dll'" "'C:\Program Files (x86)\Notepad++\plugins'"
 
-pause
+@pause
