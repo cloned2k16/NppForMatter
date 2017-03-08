@@ -1,5 +1,7 @@
-	#include "PluginDefinition.h"
-	#include "menuCmdID.h"
+	#include	"PluginDefinition.h"
+	#include	"menuCmdID.h"
+
+	#include	<stdio.h>
 
 //	-----------------------------------	---------------------------	---------------------------------
 	FuncItem	funcItem				[nbFunc];
@@ -35,36 +37,52 @@
 	    return true;
 	}
 //	-----------------------------------	---------------------------	---------------------------------
+//	-----------------------------------	---------------------------	---------------------------------
+	HWND								sciCurr;
+//	-----------------------------------	---------------------------	---------------------------------
+	void								getScintilla				()								{
+		int which = -1;
+		::SendMessage(nppData._nppHandle
+			, NPPM_GETCURRENTSCINTILLA
+			, 0
+			, (LPARAM)	&which);
+
+		if (which == -1) return;
+
+		sciCurr = (which == 0)
+				? nppData._scintillaMainHandle
+				: nppData._scintillaSecondHandle;
+	}
+//	-----------------------------------	---------------------------	---------------------------------
+	int									sciCmmnd					( int cmd )						{
+		return ::SendMessage(sciCurr,cmd,0,0);
+	}
+//	-----------------------------------	---------------------------	---------------------------------
 	void								hello						()								{
-		// Open a new document
+		
 		::SendMessage(	nppData._nppHandle
 						, NPPM_MENUCOMMAND
 						, 0
-						, IDM_FILE_NEW);
+						, IDM_FILE_NEW);							// Open a new document
 
-		// Get the current scintilla
-		int which = -1;
-		::SendMessage(	nppData._nppHandle
-						, NPPM_GETCURRENTSCINTILLA
-						, 0
-						, (LPARAM)	&which);
+		getScintilla();
 
-		if (which == -1) return;
-		
-		HWND curScintilla = (which == 0)
-							?	nppData._scintillaMainHandle
-							:	nppData._scintillaSecondHandle;
-
-		::SendMessage(	curScintilla
+		::SendMessage(	sciCurr
 						, SCI_SETTEXT
 						, 0
-						, (LPARAM)	"Hello I'm ForMatter!");
+						, (LPARAM)	"Hello I'm ForMatter ..\n");
 	}
-
 //	-----------------------------------	---------------------------	---------------------------------
 	void								helloDlg					()								{
+		getScintilla();
+		int textSz	=	sciCmmnd( SCI_GETTEXTLENGTH);
+
+		char msg[1024];
+
+		wsprintf((LPWSTR)&msg, TEXT("text len: [%d]"), textSz);
+
 		::MessageBox(	NULL
-						, TEXT("Hello guys!")						
+						, (LPCWSTR)&msg
 						, TEXT("ForMatter:")						//	Title!
 						, MB_OK);
 	}
